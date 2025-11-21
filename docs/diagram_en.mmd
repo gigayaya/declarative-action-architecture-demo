@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant Pytest
+    participant Conftest as tests/conftest.py
+    participant Base as BaseAPITest (App Layer)
+    participant Test as TestAPI (Test Case)
+    participant Client as APIClient (Physical Layer)
+
+    Note over Pytest, Client: Setup Phase (Class Scope)
+
+    Pytest->>Base: Discover autouse fixture: setup_api_client
+    Base->>Pytest: Request dependency: generate_api_client
+    Pytest->>Conftest: Call fixture: generate_api_client
+    Conftest->>Client: Instantiate APIClient()
+    Client-->>Conftest: Return client instance
+    Conftest-->>Base: Inject client instance
+    Base->>Base: self.api_client = client
+    Note right of Base: TestAPI instance now has self.api_client
+
+    Note over Pytest, Client: Execution Phase (Function Scope)
+
+    Pytest->>Test: Execute test_get_request_success()
+    Test->>Base: Call self.request_by_get_and_success(url)
+    
+    Base->>Client: self.api_client.get(url)
+    Client-->>Base: Return Response
+    Base->>Base: assert status_code == 200
+    Base-->>Test: Return Response
+
+    Test->>Pytest: Test Finished (Pass)
