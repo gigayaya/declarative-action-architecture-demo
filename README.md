@@ -83,6 +83,7 @@ demo/
 │   └── physical_layer.py  # Physical Layer (APIClient)
 ├── tests/
 │   ├── test_demo.py       # Test Layer (Test Cases)
+│   ├── test_composite_action.py # Test Layer (Composite Action Demo)
 │   └── conftest.py        # Pytest fixtures
 └── README.md
 ```
@@ -97,6 +98,13 @@ demo/
     ```
 
 ### Running Tests
+To run all tests:
+```bash
+pytest
+```
+
+To run specific test files:
 ```bash
 pytest tests/test_demo.py
+pytest tests/test_composite_action.py
 ```
