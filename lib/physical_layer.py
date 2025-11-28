@@ -39,3 +39,30 @@ class APIClient:
             Response: The response object.
         """
         return self.requester.post(url, json=data, headers=headers)
+
+    def put(self, url, data=None, headers=None):
+        """
+        Sends a PUT request.
+
+        Args:
+            url (str): The URL to send the request to.
+            data (dict, optional): JSON data to include in the request body.
+            headers (dict, optional): Headers to include in the request.
+
+        Returns:
+            Response: The response object.
+        """
+        return self.requester.put(url, json=data, headers=headers)
+
+    def delete(self, url, headers=None):
+        """
+        Sends a DELETE request.
+
+        Args:
+            url (str): The URL to send the request to.
+            headers (dict, optional): Headers to include in the request.
+
+        Returns:
+            Response: The response object.
+        """
+        return self.requester.delete(url, headers=headers)

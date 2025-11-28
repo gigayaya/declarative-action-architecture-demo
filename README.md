@@ -17,6 +17,17 @@ The core philosophy is to divide the test automation into three distinct layers:
 *   **Responsibility**: Implements the high-level actions (helper functions) used by the Test Layer.
 *   **Rule 1**: **Must verify itself.** Every action method must include an assertion to verify that the action was completed successfully. This prevents "false positives" where steps execute but achieve nothing.
 *   **Rule 2**: **No direct system access.** It must interact with the System Under Test (SUT) *only* through the Physical Layer.
+*   **Rule 3**: **Compose, Don't Repeat.** Complex business logic should be built by composing smaller, reusable "Atomic Actions" (Level 1) into "Composite Actions" (Level 2). This maximizes code reuse and ensures that if a low-level mechanism changes, you only need to update one Atomic Action.
+
+#### The Power of Composite Actions (Building Blocks)
+The Action Layer follows a "Building Block" philosophy:
+1.  **Atomic Actions (Level 1)**: Small, single-purpose actions (e.g., `create_object`, `delete_object`). These are the fundamental bricks.
+2.  **Composite Actions (Level 2)**: High-level business flows (e.g., `perform_device_upgrade`) built by assembling Atomic Actions.
+
+**Advantages:**
+*   **Scalability**: You can build infinitely complex scenarios from a finite set of Atomic Actions.
+*   **Resilience**: Business logic is decoupled from implementation details.
+*   **Readability**: Composite Actions read like a summary of the business process.
 
 ### 3. Physical Layer (The Mechanism)
 *   **Responsibility**: Handles the direct interaction with the System Under Test (e.g., HTTP requests, Selenium WebDriver calls).
