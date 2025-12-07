@@ -1,4 +1,5 @@
 import pytest
+from lib.api.physical_layer import APIClient
 
 @pytest.mark.usefixtures("generate_api_client")
 class BaseAPITest:

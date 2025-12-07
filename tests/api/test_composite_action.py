@@ -1,4 +1,4 @@
-from lib.action_layer import BaseAPITest
+from lib.api.action_layer import BaseAPITest
 
 
 class TestDeviceUpgrade(BaseAPITest):

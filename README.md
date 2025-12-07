@@ -42,36 +42,60 @@ The Action Layer follows a "Building Block" philosophy:
 
 ## Example Walkthrough
 
-Let's look at `test_get_request_success` to see how the DAA works in practice:
+### 1. API Example
 
-### 1. Test Layer (`tests/test_demo.py`)
-Declarative steps describing *what* to do.
+**Test Layer** (`tests/api/test_demo.py`):
 ```python
 def test_get_request_success(self):
     # Step 1: Perform action (Get request and verify success)
     self.request_by_get_and_success(self.DEMO_URL)
 ```
 
-### 2. Action Layer (`lib/action_layer.py`)
-The helper function `request_by_get_and_success` handles the logic and **self-verification**.
+**Action Layer** (`lib/api/action_layer.py`):
 ```python
 def request_by_get_and_success(self, url, params=None, headers=None):
     # Call Physical Layer
     response = self.api_client.get(url, params=params, headers=headers)
     
-    # Self-Verification (The "Assert" in Action)
+    # Self-Verification
     http_status = response.status_code
     assert http_status == 200, f"Expected status code 200, got {http_status}"
     
     return response
 ```
 
-### 3. Physical Layer (`lib/physical_layer.py`)
-The `get` method purely executes the HTTP request.
+**Physical Layer** (`lib/api/physical_layer.py`):
 ```python
 def get(self, url, params=None, headers=None):
-    # Direct interaction with 'requests' library
     return self.requester.get(url, params=params, headers=headers)
+```
+
+### 2. Web Example (Playwright)
+
+**Test Layer** (`tests/web/test_amazon_playwright.py`):
+```python
+def test_search_for_existing_product(self):
+    self.navigate_to_home_and_verify_title()
+    self.search_for_product_and_verify_result_list_not_empty("iPhone 15")
+```
+
+**Action Layer** (`lib/web/amazon_action_layer.py`):
+```python
+def search_for_product_and_verify_result_list_not_empty(self, keyword):
+    # Call Physical Layer
+    self.web.fill(AmazonSelectors.SEARCH_INPUT, keyword)
+    self.web.click(AmazonSelectors.SEARCH_SUBMIT_BUTTON)
+    
+    # Self-Verification
+    self.web.wait_for_selector(AmazonSelectors.SEARCH_RESULT_SLOT)
+    count = self.web.get_count(AmazonSelectors.SEARCH_RESULT_ITEM)
+    assert count > 0, f"Expected >0 results for '{keyword}', got {count}"
+```
+
+**Physical Layer** (`lib/web/playwright_physical_layer.py`):
+```python
+def fill(self, selector: str, text: str):
+    self.page.fill(selector, text)
 ```
 
 ## Project Structure
@@ -79,12 +103,19 @@ def get(self, url, params=None, headers=None):
 ```
 demo/
 ├── lib/
-│   ├── action_layer.py    # Action Layer (BaseAPITest)
-│   └── physical_layer.py  # Physical Layer (APIClient)
+│   ├── api/
+│   │   ├── action_layer.py              # API Action Layer
+│   │   └── physical_layer.py            # API Physical Layer
+│   └── web/
+│       ├── amazon_action_layer.py       # Web Action Layer (Amazon)
+│       └── playwright_physical_layer.py # Web Physical Layer (Playwright)
 ├── tests/
-│   ├── test_demo.py       # Test Layer (Test Cases)
-│   ├── test_composite_action.py # Test Layer (Composite Action Demo)
-│   └── conftest.py        # Pytest fixtures
+│   ├── api/
+│   │   ├── test_demo.py
+│   │   └── test_composite_action.py
+│   ├── web/
+│   │   └── test_amazon_playwright.py
+│   └── conftest.py
 └── README.md
 ```
 
@@ -95,16 +126,17 @@ demo/
 *   Install dependencies:
     ```bash
     pip install -r requirements.txt
+    playwright install
     ```
 
 ### Running Tests
-To run all tests:
+
+#### 1. Run API Tests
 ```bash
-pytest
+pytest tests/api/test_demo.py
 ```
 
-To run specific test files:
+#### 2. Run Web Tests (Amazon Demo)
 ```bash
-pytest tests/test_demo.py
-pytest tests/test_composite_action.py
+pytest tests/web/test_amazon_playwright.py --headed
 ```
